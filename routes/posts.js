@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const User = require('../models/User');
 const Post = require('../models/Post');
-
+const fs = require("fs");
 //CREATE POST
 router.post("/",async (req,res)=>{
     const newPost = new Post(req.body);
@@ -16,7 +16,9 @@ router.post("/",async (req,res)=>{
 router.delete("/:id",async (req,res)=>{
     const post = await Post.findById(req.params.id); //check if the post exists via id
     if(req.body.username == post.username){
+        
         try{
+            fs.unlinkSync('images/' + post.photo);
             await post.delete();     
                res.status(200).json("Post has been deleted...");
             }catch(err){
@@ -24,7 +26,7 @@ router.delete("/:id",async (req,res)=>{
             }
             
     }else {
-        res.status(500).json("U can only delte your own Post!");            
+        res.status(500).json("U can only delete your own Post!");            
     }
 });
 
@@ -56,7 +58,7 @@ router.get("/",async (req,res)=>{
         }
         res.status(200).json(posts);
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json("no posts found");
     }
 });
 //UPDATE post
